@@ -4,9 +4,11 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 
+import java.io.IOException;
+
 public class NumberActors {
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     System.out.println("Starting");
     final ActorSystem system = ActorSystem.create("number-actors");
     System.out.println("Got my actor system");
@@ -14,6 +16,10 @@ public class NumberActors {
     System.out.println("Created producer");
 
     producer.tell("start", ActorRef.noSender());
+    System.out.println("Press any key to stop");
+    System.in.read();
+    System.out.println("Shutting down actor system...");
+    system.terminate();
   }
 
 }
