@@ -28,9 +28,12 @@ public class NumberProducer extends UntypedActor {
     ActorRef printNumbersConsumer =
         getContext().system().actorOf(Props.create(NumberReceiver.class), "number-consumer");
 
+    NumberReceiver.Number num;
+
     for (int i = 1; i <= 10; i++) {
-      log.info("Sending:  {}", i);
-      printNumbersConsumer.tell(i, ActorRef.noSender());
+      num = new NumberReceiver.Number(i);
+      log.info("Sending:  {}", num);
+      printNumbersConsumer.tell(num, getSelf());
       TimeUnit.SECONDS.sleep(1);
     }
 
