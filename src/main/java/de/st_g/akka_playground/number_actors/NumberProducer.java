@@ -18,27 +18,36 @@ public class NumberProducer extends UntypedActor {
     log.info("Received {}", msg);
     String m = (String) msg;
     if (m.equals("start")) {
+      createChildActors();
       sendNumbers();
     } else {
       log.info("oh... not starting?");
     }
   }
 
-  protected void sendNumbers() throws InterruptedException {
-    ActorRef printNumbersConsumer =
-        getContext().system().actorOf(Props.create(NumberReceiver.class), "number-consumer");
+  private void sendNumbers() throws InterruptedException {
 
     NumberReceiver.Number num;
 
     for (int i = 1; i <= 10; i++) {
       num = new NumberReceiver.Number(i);
-      log.info("Sending:  {}", num);
-      printNumbersConsumer.tell(num, getSelf());
+      for (ActorRef child : getContext().getChildren()) {
+        log.info("Sending {} to {}", num, child.path());
+        child.tell(num, getSelf());
+      }
       TimeUnit.SECONDS.sleep(1);
     }
 
 
     getContext().system().terminate();
     System.out.println("Finished");
+  }
+
+  private void createChildActors() {
+    int numActors = 2;
+    log.info("Creating {} actors", numActors);
+    for (int i = 0; i < 2; i++) {
+      getContext().actorOf(Props.create(NumberReceiver.class), "number-consumer-" + i);
+    }
   }
 }
