@@ -28,11 +28,21 @@ public class NumberReceiver extends UntypedActor {
   public void onReceive(Object message) throws Exception {
     log.info("Received: {}", message);
     if (message instanceof Number) {
-      Number num = (Number) message;
-      log.info("And the number is: {}", num.getNumber());
+      processNumber((Number) message);
     } else {
       log.warning("Message not of type Number");
       unhandled(message);
     }
+  }
+
+  /**
+   * Logs the number, returns true if number >0
+   * 
+   * @param num
+   * @return
+   */
+  public boolean processNumber(Number num) {
+    log.info("And the number is: {}", num.getNumber());
+    return num.getNumber() > 0;
   }
 }

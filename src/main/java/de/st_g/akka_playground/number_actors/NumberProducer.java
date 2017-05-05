@@ -29,7 +29,7 @@ public class NumberProducer extends UntypedActor {
 
     NumberReceiver.Number num;
 
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 0; i <= 10; i++) {
       num = new NumberReceiver.Number(i);
       for (ActorRef child : getContext().getChildren()) {
         log.info("Sending {} to {}", num, child.path());
