@@ -23,18 +23,39 @@ public class NumberProducerTest {
   }
 
   @Test
-  public void integrationExectMessage() {
+  public void expectStartedMessage() {
 
     new JavaTestKit(system) {
       {
         final Props props = Props.create(NumberProducer.class);
         final ActorRef subject = system.actorOf(props);
 
-        final JavaTestKit probe = new JavaTestKit(system);
+        subject.tell("start", getRef());
 
-        subject.tell(probe.getRef(), getRef());
+        expectMsgEquals("started");
+      }
+    };
+  }
+  
+  @Test
+  public void integrationTestReceiverLog() {
 
+    new JavaTestKit(system) {
+      {
+        final Props props = Props.create(NumberReceiver.class);
+        final ActorRef subject = system.actorOf(props);
 
+        // create the message that we send
+        final NumberReceiver.Number testNum = new NumberReceiver.Number(1);
+
+        // we expect a INFO log message that such number was received
+        new EventFilter<Boolean>(akka.event.Logging.Info.class) {
+          protected Boolean run() {
+            // send the message
+            subject.tell(testNum, ActorRef.noSender());
+            return true;
+          }
+        }.message("And the number is: " + testNum.getNumber()).occurrences(1).exec();
       }
     };
   }

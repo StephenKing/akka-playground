@@ -19,6 +19,8 @@ public class NumberProducer extends UntypedActor {
     String m = (String) msg;
     if (m.equals("start")) {
       createChildActors();
+
+      getSender().tell("started", getSelf());
       sendNumbers();
     } else {
       log.info("oh... not starting?");
@@ -29,7 +31,7 @@ public class NumberProducer extends UntypedActor {
 
     NumberReceiver.Number num;
 
-    for (int i = 0; i <= 10; i++) {
+    for (int i = 0; i <= 50; i++) {
       num = new NumberReceiver.Number(i);
       for (ActorRef child : getContext().getChildren()) {
         log.info("Sending {} to {}", num, child.path());
