@@ -34,8 +34,8 @@ public class NumberActors {
         System.out.println("Created producer");
         break;
       case "consumer":
-        system.actorOf(Props.create(NumberReceiver.class), "number-consumer");
-        System.out.println("Created receiver");
+        system.actorOf(Props.create(NumberConsumer.class), "number-consumer");
+        System.out.println("Created consumer");
         break;
       case "seed":
         System.out.println("I'm the seed.. boring.");

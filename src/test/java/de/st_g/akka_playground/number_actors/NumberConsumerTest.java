@@ -12,7 +12,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class NumberReceiverTest {
+public class NumberConsumerTest {
 
   static ActorSystem system;
 
@@ -28,16 +28,16 @@ public class NumberReceiverTest {
 
   @Test
   public void unitProcessNumbers() {
-    final Props props = Props.create(NumberReceiver.class);
-    final TestActorRef<NumberReceiver> ref =
+    final Props props = Props.create(NumberConsumer.class);
+    final TestActorRef<NumberConsumer> ref =
         TestActorRef.create(system, props, "testsystem");
-    final NumberReceiver actor = ref.underlyingActor();
+    final NumberConsumer actor = ref.underlyingActor();
 
-    NumberReceiver.Number zeroNumber = new NumberReceiver.Number(0);
+    NumberConsumer.Number zeroNumber = new NumberConsumer.Number(0);
     assertFalse(actor.processNumber(zeroNumber));
 
     // should be a separate test?
-    NumberReceiver.Number bigNumber = new NumberReceiver.Number(99);
+    NumberConsumer.Number bigNumber = new NumberConsumer.Number(99);
     assertTrue(actor.processNumber(bigNumber));
 
   }
@@ -47,14 +47,14 @@ public class NumberReceiverTest {
 
     new JavaTestKit(system) {
       {
-        final Props props = Props.create(NumberReceiver.class);
+        final Props props = Props.create(NumberConsumer.class);
         final ActorRef subject = system.actorOf(props);
 
-        // we don't expect that the number receiver sends any messages
+        // we don't expect that the number consumer sends any messages
         expectNoMsg();
 
         // create the message that we send
-        final NumberReceiver.Number testNum = new NumberReceiver.Number(1);
+        final NumberConsumer.Number testNum = new NumberConsumer.Number(1);
 
         // we expect a INFO log message that such number was received
         new EventFilter<Boolean>(akka.event.Logging.Info.class) {
