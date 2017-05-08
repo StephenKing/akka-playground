@@ -1,0 +1,19 @@
+- name: Configure webupd8team repository
+  apt_repository: repo='ppa:webupd8team/java'
+
+- name: Automatically select the Oracle License
+  shell: echo 'oracle-java8-installer shared/accepted-oracle-license-v1-1 select true' | debconf-set-selections
+
+- name: Install Oracle Java 8
+  apt:
+    pkg: "oracle-java8-installer"
+    state: present
+    update_cache: yes
+#    force: yes
+
+- name: Set the default java version
+  apt:
+    pkg: "oracle-java8-set-default"
+    state: present
+#    update_cache: yes
+#    force: yes

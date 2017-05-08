@@ -1,0 +1,6 @@
+- name: Install upstart script
+  template: src=templates/upstart/numbers.conf dest=/etc/init/numbers.conf
+
+- service:
+    name: numbers
+    state: started
