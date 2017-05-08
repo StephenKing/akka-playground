@@ -56,3 +56,4 @@ local.properties
 .project
 target/
 .vagrant/
+dependency-reduced-pom.xml
