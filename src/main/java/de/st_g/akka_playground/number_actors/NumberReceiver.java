@@ -4,11 +4,13 @@ import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
+import java.io.Serializable;
+
 public class NumberReceiver extends UntypedActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-  public static class Number {
+  public static class Number implements Serializable {
     final Integer number;
 
     public Number(Integer number) {
