@@ -13,8 +13,6 @@ public class NumberProducer extends UntypedActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-  boolean sending = false;
-
   ActorRef consumerRouter = getContext()
       .actorOf(FromConfig.getInstance().props(Props.create(NumberConsumer.class)),
           "consumer-router");
@@ -26,9 +24,11 @@ public class NumberProducer extends UntypedActor {
 
   private void sendNumbers() {
 
-    NumberConsumer.Number num;
 
-    for (int i = 0; i <= 300; i++) {
+    NumberConsumer.Number num;
+    int i = 0;
+    while (true) {
+      
       num = new NumberConsumer.Number(i);
       log.info("Sending {}", num);
       consumerRouter.tell(num, getSelf());
@@ -38,6 +38,8 @@ public class NumberProducer extends UntypedActor {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
+
+      i++;
     }
   }
 
