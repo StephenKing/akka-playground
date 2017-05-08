@@ -38,15 +38,15 @@ public class NumberProducerTest {
   }
   
   @Test
-  public void integrationTestReceiverLog() {
+  public void integrationTestConsumerLog() {
 
     new JavaTestKit(system) {
       {
-        final Props props = Props.create(NumberReceiver.class);
+        final Props props = Props.create(NumberConsumer.class);
         final ActorRef subject = system.actorOf(props);
 
         // create the message that we send
-        final NumberReceiver.Number testNum = new NumberReceiver.Number(1);
+        final NumberConsumer.Number testNum = new NumberConsumer.Number(1);
 
         // we expect a INFO log message that such number was received
         new EventFilter<Boolean>(akka.event.Logging.Info.class) {

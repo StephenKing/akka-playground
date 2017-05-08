@@ -6,7 +6,7 @@ import akka.event.LoggingAdapter;
 
 import java.io.Serializable;
 
-public class NumberReceiver extends UntypedActor {
+public class NumberConsumer extends UntypedActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 

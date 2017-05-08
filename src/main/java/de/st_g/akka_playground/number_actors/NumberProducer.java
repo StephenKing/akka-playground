@@ -16,8 +16,8 @@ public class NumberProducer extends UntypedActor {
   boolean sending = false;
 
   ActorRef consumerRouter = getContext()
-      .actorOf(FromConfig.getInstance().props(Props.create(NumberReceiver.class)),
-          "receiver-router");
+      .actorOf(FromConfig.getInstance().props(Props.create(NumberConsumer.class)),
+          "consumer-router");
 
   public NumberProducer() {
     sendNumbers();
@@ -26,10 +26,10 @@ public class NumberProducer extends UntypedActor {
 
   private void sendNumbers() {
 
-    NumberReceiver.Number num;
+    NumberConsumer.Number num;
 
     for (int i = 0; i <= 300; i++) {
-      num = new NumberReceiver.Number(i);
+      num = new NumberConsumer.Number(i);
       log.info("Sending {}", num);
       consumerRouter.tell(num, getSelf());
 
