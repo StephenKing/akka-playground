@@ -32,7 +32,6 @@ public class NumberActors {
         final ActorRef producer =
             system.actorOf(Props.create(NumberProducer.class), "number-producer");
         System.out.println("Created producer");
-//        producer.tell("start", ActorRef.noSender());
         break;
       case "consumer":
         system.actorOf(Props.create(NumberReceiver.class), "number-consumer");
