@@ -11,6 +11,7 @@ import java.io.IOException;
 public class NumberActors {
 
   public static void main(String[] args) throws IOException {
+
     System.out.println("Starting");
     final ActorSystem system = ActorSystem.create("number-actors");
     System.out.println("Got my actor system");
@@ -19,29 +20,35 @@ public class NumberActors {
     ConfigList roles = system.settings().config().getList("akka.cluster.roles");
     if (roles.size() != 1) {
       throw new IllegalArgumentException(
-          "Expected akka.cluster.roles to contain exactly one role. Got: " + roles);
+          "Expected akka.cluster.roles to contain exactly one role. Got: " + roles.unwrapped());
     }
     System.out.println(roles);
 
-    ConfigValue role = roles.get(0);
+    ConfigValue roleConfig = roles.get(0);
+    String role = roleConfig.unwrapped().toString();
 
-    if (role.unwrapped().toString().equals("producer")) {
-      final ActorRef producer = system.actorOf(Props.create(NumberProducer.class), "number-producer");
-      System.out.println("Created producer");
-      producer.tell("start", ActorRef.noSender());
+    switch (role) {
+      case "producer":
+        final ActorRef producer =
+            system.actorOf(Props.create(NumberProducer.class), "number-producer");
+        System.out.println("Created producer");
+//        producer.tell("start", ActorRef.noSender());
+        break;
+      case "consumer":
+        system.actorOf(Props.create(NumberReceiver.class), "number-consumer");
+        System.out.println("Created receiver");
+        break;
+      case "seed":
+        System.out.println("I'm the seed.. boring.");
+        break;
+      default:
+        throw new IllegalArgumentException("Value " + role + " is invalid in akka.cluster.roles");
     }
-//        case:"consumer":System.out.println("Created consumer");
-//      break;
-//        case:"seed":
-//      System.out.println("I'm the seed.. boring.");
-//      default:
-//        throw new IllegalArgumentException("Value " + role + " is invalid in akka.cluster.roles");
 
-
-//    System.out.println("Press any key to stop");
-//    System.in.read();
-//    System.out.println("Shutting down actor system...");
-//    system.terminate();
+    //    System.out.println("Press any key to stop");
+    //    System.in.read();
+    //    System.out.println("Shutting down actor system...");
+    //    system.terminate();
   }
 
 }
