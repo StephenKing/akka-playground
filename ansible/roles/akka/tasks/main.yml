@@ -1,5 +1,10 @@
 - name: Install upstart script
   template: src=templates/upstart/numbers.conf dest=/etc/init/numbers.conf
+  vars:
+    actor_system: number-actors
+    seed_node_ip: 192.168.88.10
+  notify:
+    - restart numbers
 
 - service:
     name: numbers
