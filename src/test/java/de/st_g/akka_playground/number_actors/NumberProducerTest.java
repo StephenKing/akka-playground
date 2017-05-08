@@ -23,21 +23,6 @@ public class NumberProducerTest {
   }
 
   @Test
-  public void expectStartedMessage() {
-
-    new JavaTestKit(system) {
-      {
-        final Props props = Props.create(NumberProducer.class);
-        final ActorRef subject = system.actorOf(props);
-
-        subject.tell("start", getRef());
-
-        expectMsgEquals("started");
-      }
-    };
-  }
-  
-  @Test
   public void integrationTestConsumerLog() {
 
     new JavaTestKit(system) {
