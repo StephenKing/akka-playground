@@ -57,3 +57,6 @@ local.properties
 target/
 .vagrant/
 dependency-reduced-pom.xml
+
+# ansible
+*.retry
