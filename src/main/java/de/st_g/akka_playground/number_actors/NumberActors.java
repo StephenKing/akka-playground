@@ -5,12 +5,21 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigList;
 import com.typesafe.config.ConfigValue;
+import kamon.Kamon;
+import kamon.metric.Counter;
+import kamon.prometheus.PrometheusReporter;
 
 import java.io.IOException;
 
 public class NumberActors {
 
   public static void main(String[] args) throws IOException {
+
+    PrometheusReporter rep = new PrometheusReporter();
+    Kamon.addReporter(rep);
+    Counter c =  Kamon.counter("akka.test.counter");
+    c.increment(42L);
+
 
     System.out.println("Starting");
     final ActorSystem system = ActorSystem.create("number-actors");
