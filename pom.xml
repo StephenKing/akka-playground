@@ -16,6 +16,17 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>bintray-kamon-io-snapshots</id>
+      <name>bintray</name>
+      <url>http://dl.bintray.com/kamon-io/snapshots</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -37,6 +48,26 @@
       <groupId>com.typesafe.akka</groupId>
       <artifactId>akka-cluster_2.11</artifactId>
       <version>2.4.17</version>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.8.10</version>
+    </dependency>
+    <dependency>
+      <groupId>io.kamon</groupId>
+      <artifactId>kamon-core_2.11</artifactId>
+      <version>1.0.0-RC1-670f32d19a30283a39a0519a74fc5c6a0efd379b</version>
+    </dependency>
+    <dependency>
+      <groupId>io.kamon</groupId>
+      <artifactId>kamon-prometheus_2.11</artifactId>
+      <version>1.0.0-RC1-913b82fb85e293bc5ccee6fc46af428cb5834e67</version>
+    </dependency>
+    <dependency>
+      <groupId>io.kamon</groupId>
+      <artifactId>kamon-akka-2.4_2.11</artifactId>
+      <version>1.0.0-RC1-f8de4d4c7343bb4c7774ac65580ef9d0ae2c32db</version>
     </dependency>
   </dependencies>
   
