@@ -6,14 +6,23 @@ import akka.actor.Props;
 import com.typesafe.config.ConfigList;
 import com.typesafe.config.ConfigValue;
 import kamon.Kamon;
+import kamon.jaeger.Jaeger;
+import kamon.jaeger.JaegerClient;
 import kamon.metric.Counter;
 import kamon.prometheus.PrometheusReporter;
+import kamon.trace.Span;
+import kamon.trace.Span.Local;
 
 import java.io.IOException;
 
 public class NumberActors {
 
   public static void main(String[] args) throws IOException {
+
+    Jaeger jaeger = new Jaeger();
+    Kamon.addReporter(jaeger);
+    jaeger.start();
+
 
     PrometheusReporter rep = new PrometheusReporter();
     Kamon.addReporter(rep);

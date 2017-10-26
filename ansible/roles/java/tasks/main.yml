@@ -17,3 +17,14 @@
     state: present
 #    update_cache: yes
 #    force: yes
+
+- name: Create AspectJ Weaver directory
+  file:
+    path: /usr/local/lib/aspectjweaver/
+    state: directory
+    mode: 0644
+
+- name: Download AspectJ Weaver
+  get_url:
+    url: http://central.maven.org/maven2/org/aspectj/aspectjweaver/1.8.10/aspectjweaver-1.8.10.jar
+    dest: /usr/local/lib/aspectjweaver/aspectjweaver-1.8.10.jar

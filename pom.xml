@@ -69,6 +69,16 @@
       <artifactId>kamon-akka-2.4_2.11</artifactId>
       <version>1.0.0-RC1-f8de4d4c7343bb4c7774ac65580ef9d0ae2c32db</version>
     </dependency>
+    <dependency>
+      <groupId>io.kamon</groupId>
+      <artifactId>kamon-jdbc_2.11</artifactId>
+      <version>1.0.0-RC1-b0f5cc5b7ba910522b1fc3cd70d65a74e39fcf0b</version>
+    </dependency>
+    <dependency>
+      <groupId>io.kamon</groupId>
+      <artifactId>kamon-jaeger_2.11</artifactId>
+      <version>1.0.0-RC1-9eec74a0c7f4332336928431852104cc9ad19373</version>
+    </dependency>
   </dependencies>
   
   <build>
