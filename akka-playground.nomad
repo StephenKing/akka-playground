@@ -355,7 +355,9 @@ job "akka-playground" {
         memory = 1024 # 256MB
         network {
           mbits = 10
-          port "akka" {}
+          port "akka" {
+            static = "2551"
+          }
         }
       }
     }
