@@ -326,7 +326,6 @@ job "akka-playground" {
     task "app" {
       driver = "java"
 
-      user = "st"
       leader = true
 
       config {
@@ -392,7 +391,6 @@ job "akka-playground" {
     task "app" {
       driver = "java"
 
-      user = "st"
       leader = true
 
       config {
@@ -450,7 +448,6 @@ job "akka-playground" {
     task "app" {
       driver = "java"
 
-      user = "st"
       leader = true
 
       config {
