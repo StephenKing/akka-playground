@@ -360,6 +360,18 @@ job "akka-playground" {
           }
         }
       }
+
+      service {
+        name = "seed"
+        tags = ["akka", "seed"]
+        port = "akka"
+        check {
+          name     = "alive"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
     }
   }
 
@@ -407,6 +419,18 @@ job "akka-playground" {
           port "akka" {}
         }
       }
+      service {
+        name = "producer"
+        tags = ["akka", "producer"]
+        port = "akka"
+        check {
+          name     = "alive"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+
     }
   }
   group "numbers-consumer" {
@@ -447,6 +471,17 @@ job "akka-playground" {
         network {
           mbits = 10
           port "akka" {}
+        }
+      }
+      service {
+        name = "consumer"
+        tags = ["akka", "consumer"]
+        port = "akka"
+        check {
+          name     = "alive"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
         }
       }
     }
