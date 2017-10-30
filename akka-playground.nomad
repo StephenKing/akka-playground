@@ -18,7 +18,7 @@ job "akka-playground" {
 
   # The "datacenters" parameter specifies the list of datacenters which should
   # be considered when placing this task. This must be provided.
-  datacenters = ["dc1"]
+  datacenters = ["eu-west-1-private"]
 
   # The "type" parameter controls the type of job, which impacts the scheduler's
   # decision on placement. This configuration is optional and defaults to
@@ -198,7 +198,7 @@ job "akka-playground" {
 //      #     https://www.nomadproject.io/docs/job-specification/artifact.html
 //      #
 //      artifact {
-//        source = "http://localhost:8000/target/akka-playground-0.0.1-SNAPSHOT.tar.gz"
+//        source = "http://192.168.33.1:8000/target/akka-playground-0.0.1-SNAPSHOT.tar.gz"
 //        #   options {
 //        #     checksum = "md5:c4aa853ad2215426eb7d70a21922e794"
 //        #   }
@@ -231,7 +231,7 @@ job "akka-playground" {
 //      #
 //      resources {
 //        cpu    = 500 # 500 MHz
-//        memory = 1024 # 256MB
+//        memory = 512 # 256MB
 //        network {
 //          mbits = 10
 //          port "akka" {}
@@ -253,7 +253,7 @@ job "akka-playground" {
 //      #  tags = ["global", "esc"]
 //      #  port = "2551"
 //      #  check {
-//      #    name     = "alive"
+//      #    name     = "akka"
 //      #    type     = "tcp"
 //      #    interval = "10s"
 //      #    timeout  = "2s"
@@ -331,7 +331,8 @@ job "akka-playground" {
       config {
         jvm_options = ["-Xmx2048m", "-Xms256m", "-Dakka.home='${NOMAD_TASK_DIR}'",
           "-Dakka.cluster.roles.0=seed",
-          "-Dakka.remote.netty.tcp.port=2551" # FIXME and use consul for SD
+          "-Dakka.remote.netty.tcp.hostname=numbers-seed.service.consul",
+          "-Dakka.remote.netty.tcp.port=2551",
         ]
         class_path = "'${NOMAD_TASK_DIR}/config:${NOMAD_TASK_DIR}/deploy/*:${NOMAD_TASK_DIR}/lib/*'"
         class = "de.st_g.akka_playground.number_actors.NumberActors"
@@ -343,15 +344,12 @@ job "akka-playground" {
 //      }
 
       artifact {
-        source = "http://localhost:8000/target/akka-playground-0.0.1-SNAPSHOT.tar.gz"
-        #   options {
-        #     checksum = "md5:c4aa853ad2215426eb7d70a21922e794"
-        #   }
+        source = "https://s3-eu-west-1.amazonaws.com/steffen-test-public/akka-playground/akka-playground-0.0.1-SNAPSHOT.zip"
       }
 
       resources {
         cpu    = 500 # 500 MHz
-        memory = 1024 # 256MB
+        memory = 512 # 256MB
         network {
           mbits = 10
           port "akka" {
@@ -361,11 +359,11 @@ job "akka-playground" {
       }
 
       service {
-        name = "seed"
+        name = "numbers-seed"
         tags = ["akka", "seed"]
         port = "akka"
         check {
-          name     = "alive"
+          name     = "akka"
           type     = "tcp"
           interval = "10s"
           timeout  = "2s"
@@ -395,7 +393,7 @@ job "akka-playground" {
 
       config {
         jvm_options = ["-Xmx2048m", "-Xms256m", "-Dakka.home='${NOMAD_TASK_DIR}'", "-Dakka.cluster.roles.0=producer",
-          "-Dakka.cluster.seed-nodes.0=akka.tcp://number-actors@127.0.0.1:2551" # FIXME and use consul for SD
+          "-Dakka.cluster.seed-nodes.0=akka.tcp://number-actors@numbers-seed.service.consul:2551"
         ]
         class_path = "'${NOMAD_TASK_DIR}/config:${NOMAD_TASK_DIR}/deploy/*:${NOMAD_TASK_DIR}/lib/*'"
         class = "de.st_g.akka_playground.number_actors.NumberActors"
@@ -407,22 +405,22 @@ job "akka-playground" {
 //      }
 
       artifact {
-        source = "http://localhost:8000/target/akka-playground-0.0.1-SNAPSHOT.tar.gz"
+        source = "https://s3-eu-west-1.amazonaws.com/steffen-test-public/akka-playground/akka-playground-0.0.1-SNAPSHOT.zip"
       }
       resources {
         cpu    = 500 # 500 MHz
-        memory = 1024 # 256MB
+        memory = 512 # 256MB
         network {
           mbits = 10
           port "akka" {}
         }
       }
       service {
-        name = "producer"
+        name = "numbers-producer"
         tags = ["akka", "producer"]
         port = "akka"
         check {
-          name     = "alive"
+          name     = "akka"
           type     = "tcp"
           interval = "10s"
           timeout  = "2s"
@@ -452,7 +450,7 @@ job "akka-playground" {
 
       config {
         jvm_options = ["-Xmx2048m", "-Xms256m", "-Dakka.home='${NOMAD_TASK_DIR}'", "-Dakka.cluster.roles.0=consumer",
-          "-Dakka.cluster.seed-nodes.0=akka.tcp://number-actors@127.0.0.1:2551" # FIXME and use consul for SD
+          "-Dakka.cluster.seed-nodes.0=akka.tcp://number-actors@numbers-seed.service.consul:2551"
         ]
         class_path = "'${NOMAD_TASK_DIR}/config:${NOMAD_TASK_DIR}/deploy/*:${NOMAD_TASK_DIR}/lib/*'"
         class = "de.st_g.akka_playground.number_actors.NumberActors"
@@ -460,22 +458,22 @@ job "akka-playground" {
       }
 
       artifact {
-        source = "http://localhost:8000/target/akka-playground-0.0.1-SNAPSHOT.tar.gz"
+        source = "https://s3-eu-west-1.amazonaws.com/steffen-test-public/akka-playground/akka-playground-0.0.1-SNAPSHOT.zip"
       }
       resources {
         cpu    = 500 # 500 MHz
-        memory = 1024 # 256MB
+        memory = 512 # 256MB
         network {
           mbits = 10
           port "akka" {}
         }
       }
       service {
-        name = "consumer"
+        name = "numbers-consumer"
         tags = ["akka", "consumer"]
         port = "akka"
         check {
-          name     = "alive"
+          name     = "akka"
           type     = "tcp"
           interval = "10s"
           timeout  = "2s"
@@ -484,3 +482,11 @@ job "akka-playground" {
     }
   }
 }
+
+
+#####
+## seed using seed.service.consul
+# [ERROR] [10/30/2017 09:28:59.231] [number-actors-akka.remote.default-remote-dispatcher-20] [akka://number-actors/system/endpointManager/reliableEndpointWriter-akka.tcp%3A%2F%2Fnumber-actors%4010.0.22.17%3A28879-3/endpointWriter] dropping message [class akka.actor.ActorSelectionMessage] for non-local recipient [Actor[akka.tcp://number-actors@seed.service.consul:2551/]] arriving at [akka.tcp://number-actors@seed.service.consul:2551] inbound addresses are [akka.tcp://number-actors@10.0.59.249:2551]
+# Exception in thread "main" java.net.UnknownHostException: numbers-seed.service.consul: Name or service not known
+#
+# --> Henne-Ei
