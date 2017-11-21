@@ -5,10 +5,13 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
 import java.io.Serializable;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class NumberConsumer extends UntypedActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+  Random rand = new Random();
 
   public static class Number implements Serializable {
     final Integer number;
@@ -30,6 +33,9 @@ public class NumberConsumer extends UntypedActor {
   public void onReceive(Object message) throws Exception {
     log.info("Received: {}", message);
     if (message instanceof Number) {
+      int sleep = rand.nextInt(100);
+      log.info("Sleeping for {}ms", sleep);
+      TimeUnit.MILLISECONDS.sleep(sleep);
       processNumber((Number) message);
     } else {
       log.warning("Message not of type Number");

@@ -8,6 +8,8 @@ import com.typesafe.config.ConfigValue;
 import kamon.Kamon;
 import kamon.jaeger.Jaeger;
 import kamon.jaeger.JaegerClient;
+import kamon.kamino.KaminoReporter;
+import kamon.kamino.KaminoTracingReporter;
 import kamon.metric.Counter;
 import kamon.prometheus.PrometheusReporter;
 import kamon.trace.Span;
@@ -26,6 +28,11 @@ public class NumberActors {
 
     PrometheusReporter rep = new PrometheusReporter();
     Kamon.addReporter(rep);
+    KaminoReporter kam = new KaminoReporter();
+    Kamon.addReporter(kam);
+    KaminoTracingReporter tra = new KaminoTracingReporter();
+    Kamon.addReporter(tra);
+
     Counter c =  Kamon.counter("akka.test.counter");
     c.increment(42L);
 

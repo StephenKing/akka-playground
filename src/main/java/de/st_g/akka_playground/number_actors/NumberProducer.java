@@ -13,12 +13,14 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.routing.FromConfig;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class NumberProducer extends UntypedActor {
 
   LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   Cluster cluster = Cluster.get(getContext().system());
+  Random rand = new Random();
 
   ActorRef consumerRouter = getContext()
       .actorOf(FromConfig.getInstance().props(Props.create(NumberConsumer.class)),
@@ -49,7 +51,10 @@ public class NumberProducer extends UntypedActor {
       consumerRouter.tell(num, getSelf());
 
       try {
-        TimeUnit.SECONDS.sleep(1);
+        int sleep = rand.nextInt(50);
+        log.info("Sleeping for {}ms", sleep);
+        TimeUnit.MILLISECONDS.sleep(sleep);
+
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
