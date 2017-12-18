@@ -3,12 +3,18 @@ package de.st_g.akka_playground.number_actors;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import scala.concurrent.duration.Duration;
+
 import com.typesafe.config.ConfigList;
 import com.typesafe.config.ConfigValue;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class NumberActors {
+
+
+  public static final String START = "start";
 
   public static void main(String[] args) throws IOException {
 
@@ -32,10 +38,12 @@ public class NumberActors {
         final ActorRef producer =
             system.actorOf(Props.create(NumberProducer.class), "number-producer");
         System.out.println("Created producer");
+        producer.tell(START, null);
         break;
       case "consumer":
-        system.actorOf(Props.create(NumberConsumer.class), "number-consumer");
+        final ActorRef consumer = system.actorOf(Props.create(NumberConsumer.class), "number-consumer");
         System.out.println("Created consumer");
+        system.scheduler().scheduleOnce(Duration.create(5, TimeUnit.SECONDS), consumer, START, system.dispatcher(), null);
         break;
       case "seed":
         System.out.println("I'm the seed.. boring.");

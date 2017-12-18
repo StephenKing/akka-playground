@@ -1,30 +1,36 @@
 package de.st_g.akka_playground.number_actors;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import akka.actor.ActorRef;
-import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
-import akka.cluster.ClusterEvent.CurrentClusterState;
 import akka.cluster.ClusterEvent.MemberEvent;
-import akka.cluster.ClusterEvent.MemberUp;
-import akka.cluster.ClusterEvent.UnreachableMember;
+import akka.cluster.ddata.DistributedData;
+import akka.cluster.ddata.GCounter;
+import akka.cluster.ddata.GCounterKey;
+import akka.cluster.ddata.Key;
+import akka.cluster.ddata.LWWMap;
+import akka.cluster.ddata.LWWMapKey;
+import akka.cluster.ddata.Replicator.Update;
+import akka.cluster.ddata.Replicator.WriteConsistency;
+import akka.cluster.ddata.Replicator.WriteMajority;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.routing.FromConfig;
-
-import java.util.concurrent.TimeUnit;
+import scala.concurrent.duration.Duration;
+import scala.math.BigInt;
+import sun.misc.GC;
 
 public class NumberProducer extends UntypedActor {
 
+  public static final String WRITE = "write!";
   LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   Cluster cluster = Cluster.get(getContext().system());
-
-  ActorRef consumerRouter = getContext()
-      .actorOf(FromConfig.getInstance().props(Props.create(NumberConsumer.class)),
-          "consumer-router");
-
-  private boolean consumersAvailable = false;
+  final ActorRef replicator = DistributedData.get(getContext().system()).replicator();
+  static Key<LWWMap<Integer, Integer>> ImsiDataKey = LWWMapKey.create("imsi-to-endpoint");
+  private final Key<GCounter> cDataKey = GCounterKey.create("c");
+  final WriteConsistency writeMajority = new WriteMajority(Duration.create(5, SECONDS));
 
   @Override public void preStart() throws Exception {
     cluster.subscribe(getSelf(), ClusterEvent.initialStateAsEvents(), MemberEvent.class,
@@ -35,69 +41,45 @@ public class NumberProducer extends UntypedActor {
     cluster.unsubscribe(getSelf());
   }
 
-  private void sendNumbers() {
+  private void onDoWrite() {
 
+    int i = 3;
 
-    NumberConsumer.Number num;
-    int i = 0;
-    while (true) {
+    log.info("Saving {}=42 in {}", i, ImsiDataKey);
 
-      waitConsumerAvailable();
+    Update<LWWMap<Integer, Integer>> u = new Update<>(ImsiDataKey, LWWMap.create(),
+        writeMajority, curr -> curr.put(cluster, i, 42));
+    replicator.tell(u, getSelf());
 
-      num = new NumberConsumer.Number(i);
-      log.info("Sending {}", num);
-      consumerRouter.tell(num, getSelf());
+    log.info("Incrementing counter c by 3");
+    Update<GCounter> u2 = new Update<>(cDataKey, GCounter.create(), writeMajority, curr -> curr.increment(cluster, 3L));
+    replicator.tell(u2, getSelf());
 
-      try {
-        TimeUnit.SECONDS.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-
-      i++;
+    try {
+      SECONDS.sleep(1);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
   }
 
-  private void waitConsumerAvailable() {
-    while (!consumersAvailable) {
-      log.debug("Waiting for consumers to come up...");
-      try {
-        TimeUnit.SECONDS.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
-  private void setConsumersAvailable(boolean newStatus) {
-    boolean oldStatus = consumersAvailable;
-    consumersAvailable = newStatus;
-    // we're changing from no consumers to consumers available
-    if (newStatus && !oldStatus) {
-      sendNumbers();
-    }
-  }
 
   @Override public void onReceive(Object message) throws Throwable {
     log.info("Received message: {}", message);
-    if (message instanceof CurrentClusterState) {
-      CurrentClusterState state = (CurrentClusterState) message;
-      if (state.getAllRoles().contains("consumer")) {
-        log.info("There's a consumer among all our roles: {}", state.getAllRoles());
-        setConsumersAvailable(true);
-      } else {
-        setConsumersAvailable(false);
-      }
-    } else if (message instanceof MemberUp) {
-      MemberUp upEvent = (MemberUp) message;
-      if (upEvent.member().roles().contains("consumer")) {
-        log.info("Got a consumer at {}", upEvent.member().address());
-        setConsumersAvailable(true);
-      }
-    } else if (message instanceof ClusterEvent.MemberLeft) {
-      log.info("Member left: {}", ((ClusterEvent.MemberLeft) message).member().address());
-    } else if (message instanceof ClusterEvent.MemberRemoved) {
-      log.info("Member removed: {}", ((ClusterEvent.MemberRemoved) message).member().address());
+    if (NumberActors.START.equals(message)) {
+      onStart();
+    } else if (WRITE.equals(message)) {
+      onDoWrite();
     }
+  }
+
+  private void onStart() {
+    context().system().scheduler().schedule(
+        Duration.Zero(),
+        Duration.create(15, SECONDS),
+        self(),
+        WRITE,
+        context().system().dispatcher(),
+        getSelf()
+    );
   }
 }
