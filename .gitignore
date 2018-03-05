@@ -55,3 +55,8 @@ local.properties
 .classpath
 .project
 target/
+.vagrant/
+dependency-reduced-pom.xml
+
+# ansible
+*.retry
